@@ -311,5 +311,3 @@ class Meta(commands.Cog):
         embed.add_field(name="discord.py", value=f"v{discord.__version__}")
         embed.set_footer(text=f"Made by {__author__} with ❤️")
         await ctx.send(embed=embed)
-        
-        

@@ -165,3 +165,4 @@
 2023-10-23 19:11:15 INFO     core.bot Loaded extension: developer
 2023-10-23 19:11:15 ERROR    core.bot Failed to load extension events: Extension 'cogs.events' has no 'setup' function.
 2023-10-23 19:11:16 INFO     core.bot Loaded extension: meta
+2023-10-23 19:11:20 INFO     core.bot Logged in as Krypton#6947
