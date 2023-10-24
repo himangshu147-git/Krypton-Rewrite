@@ -3,19 +3,20 @@ import json
 import time
 from typing import Any
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 
 repo = "himangshu147-git/krypton-Rewrite"
 def get_latest_change():
-    r = requests.get(f"https://api.github.com/repos/{repo}/commits/master?per_page=1")
+    r = requests.get(f"https://api.github.com/repos/{repo}/commits?per_page=1")
     data = r.json()
-    sha = data['sha']
-    url = data['html_url']
-    author = data['commit']['author']['name']
-    message = data['commit']['message']
-    time = data['commit']['author']['date']
+    sha = data[0]['sha']
+    url = data[0]['html_url']
+    author = data[0]['commit']['author']['name']
+    message = data[0]['commit']['message']
+    time = data[0]['commit']['author']['date']
     dt = datetime.fromisoformat(time[:-1])
-    timestamp = dt.timestamp()
+    
+    timestamp = dt.replace(tzinfo=timezone.utc).timestamp()
     return sha, url, message, author, timestamp
 
 def generate_thumbnail(identifier):

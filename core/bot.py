@@ -62,6 +62,8 @@ class Krypton(commands.Bot):
         self.config = config
         self.setup_logging()
         self.uptime = None
+        self.color = 0xffec00
+
 
     def setup_logging(self):
         self._log = logging.getLogger(__name__)
@@ -92,14 +94,22 @@ class Krypton(commands.Bot):
     async def setup_hook(self) -> None:
         self.uptime = discord.utils.utcnow().timestamp()
         await self.setup_extensions()
-
+        await self.setup_application_commands()
+        
+    async def setup_application_commands(self) -> None:
+        c = await self.tree.sync()
+        self._log.info(f"Synced {len(c)} commands")
+        
     async def setup_extensions(self) -> None:
         for extension in self.config.extensions:
             try:
                 await self.load_extension(f"cogs.{extension}")
                 self._log.info(f"Loaded extension: {extension}")
             except Exception as e:
-                self._log.error(f"Failed to load extension {extension}: {e}")   
+                self._log.error(f"Failed to load extension {extension}: {e}") 
+
+        await self.load_extension("jishaku")
+        self._log.info(f"Loaded extension: jishaku")  
         
     def boot(self):
         """
@@ -110,5 +120,3 @@ class Krypton(commands.Bot):
         if KeyboardInterrupt:
             self._log.info("Shutting down...")
             os._exit(0)
-
-    

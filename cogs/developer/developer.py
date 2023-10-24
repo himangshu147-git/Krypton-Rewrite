@@ -17,14 +17,16 @@ class Developer(commands.Cog):
         if cog == "all":
             for cog in config.extensions:
                 try:
-                    await self.bot.reload_extension("cogs."+cog)
+                    await self.bot.unload_extension("cogs."+cog)
+                    await self.bot.load_extension("cogs."+cog)
                 except Exception as e:
                     return await ctx.error(f'Failed to reload cog `{cog}`: `{e}`')
                 else:
                     await ctx.send(f'Reloaded cog `{cog}`')
         else:
             try:
-                await self.bot.reload_extension("cogs."+cog)
+                await self.bot.unload_extension("cogs."+cog)
+                await self.bot.load_extension("cogs."+cog)
             except Exception as e:
                 return await ctx.error(f'Failed to reload cog `{cog}`: `{e}`')
             else:
@@ -38,7 +40,7 @@ class Developer(commands.Cog):
         if cog == "all":
             for cog in config.extensions:
                 try:
-                    await self.bot.reload_extension("cogs."+cog)
+                    await self.bot.load_extension("cogs."+cog)
                 except Exception as e:
                     return await ctx.error(f'Failed to reload cog `{cog}`: `{e}`')
                 else:

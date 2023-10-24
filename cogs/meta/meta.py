@@ -122,7 +122,7 @@ class FrontPageSource(menus.PageSource):
         return self
 
     def format_page(self, menu: HelpMenu, page: Any):
-        embed = discord.Embed(title='Bot Help', colour=__import__('config').color)
+        embed = discord.Embed(title='Bot Help', colour=config.color)
         embed.description = inspect.cleandoc(
             f"""
             Hello! Welcome to the help page.
@@ -300,7 +300,7 @@ class Meta(commands.Cog):
         embed = discord.Embed(title=f"{self.bot.user.name}", color=self.bot.config.color)
         embed.description = (
             f"**Latest Changes**\n"
-            f"[{(changes[0][:8])}]({changes[1]}) - {changes[2]} - [{changes[3]}](https://github.com/{changes[3]}) - <t:{int(changes[4])}:R>\n"
+            f"[{(changes[0][:8])}]({changes[1]}) - `{changes[2]}` - [{changes[3]}](https://github.com/{changes[3]}) - <t:{int(discord.utils.utcnow(changes[4]))}:R>\n"
         )
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
         embed.add_field(name="Guilds", value=format(len(self.bot.guilds), ",d"))
