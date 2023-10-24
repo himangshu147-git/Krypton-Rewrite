@@ -5,5 +5,4 @@ from .helpers import *
 from .welcome_card import *
 from .checks import *
 from .converter import *
-from .database import *
 from .captcha import *
