@@ -236,3 +236,4 @@
 2023-10-24 15:47:28 ERROR    core.bot Failed to load extension meta: Extension 'cogs.meta' raised an error: ModuleNotFoundError: No module named 'utils.database'
 2023-10-24 15:47:28 INFO     core.bot Loaded extension: jishaku
 2023-10-24 15:47:28 INFO     core.bot Synced 0 commands
+2023-10-24 15:47:33 INFO     core.bot Logged in as Krypton#6947
