@@ -1,5 +1,12 @@
 **/config.py
+
 **/__pycache__
 **/*.pyc
+
+*.log
 **/*.log
-**/log.log
+log.log
+
+*.db
+**/*.db
+database.db

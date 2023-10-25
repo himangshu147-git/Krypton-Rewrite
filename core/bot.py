@@ -3,6 +3,7 @@ import os
 from logging.handlers import RotatingFileHandler
 from typing import Any, Union
 
+import aiosqlite
 import discord
 import jishaku
 from discord.ext import commands
@@ -63,6 +64,7 @@ class Krypton(commands.Bot):
         self.setup_logging()
         self.uptime = None
         self.color = 0xffec00
+        self.db = None
 
 
     def setup_logging(self):
@@ -90,7 +92,8 @@ class Krypton(commands.Bot):
     async def on_ready(self):
         self._log.info(f"Logged in as {self.user}")
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"I'm coming soon"))
-
+        await self.init_db()
+        
     async def setup_hook(self) -> None:
         self.uptime = discord.utils.utcnow().timestamp()
         await self.setup_extensions()
@@ -109,7 +112,24 @@ class Krypton(commands.Bot):
                 self._log.error(f"Failed to load extension {extension}: {e}") 
 
         await self.load_extension("jishaku")
-        self._log.info(f"Loaded extension: jishaku")  
+        self._log.info(f"Loaded extension: jishaku") 
+
+    async def init_db(self):
+        """Initialize the database."""
+        self._log.info("Initializing database...")
+        self.db = await aiosqlite.connect("db.db")
+        self._log.info(f"Initialized database. {self.db}")
+        async with self.db.cursor() as cur:
+            await cur.execute(
+                """CREATE TABLE IF NOT EXISTS captcha (
+                    guild_id INTEGER PRIMARY KEY,
+                    channel_id INTEGER,
+                    verified_role INTEGER,
+                    unverified_role INTEGER
+                    )
+                """
+            )
+            await self.db.commit()
         
     def boot(self):
         """
