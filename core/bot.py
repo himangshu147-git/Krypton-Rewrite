@@ -123,9 +123,7 @@ class Krypton(commands.Bot):
             await cur.execute(
                 """CREATE TABLE IF NOT EXISTS captcha (
                     guild_id INTEGER PRIMARY KEY,
-                    channel_id INTEGER,
-                    verified_role INTEGER,
-                    unverified_role INTEGER
+                    verified_role INTEGER
                     )
                 """
             )

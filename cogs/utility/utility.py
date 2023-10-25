@@ -37,28 +37,43 @@ class Utility(commands.Cog):
                     await ctx.send(f"This server already has a captcha enabled, Please run `{ctx.prefix}captcha disable` to disable it.")
                     return
                 
-                u_perms = discord.Permissions()
-                u_perms.update(**dict(read_messages=False, send_messages=False, view_channels=False))
                 v_perms = discord.Permissions()
                 v_perms.update(**dict(read_messages=True, send_messages=True))
+
                 v_role: discord.Role = await ctx.guild.create_role(name="Verified", color=discord.Color.green(), permissions=v_perms)
-                u_role: discord.Role = await ctx.guild.create_role(name="Unverified", color=discord.Color.red(), permissions=u_perms)
-                v_channel: discord.TextChannel = await ctx.guild.create_text_channel(name="captcha-verification", position=0, topic="Verify yourself to gain access to the server.")
-                await v_channel.set_permissions(u_role, read_messages=True, send_messages=True)
-                await v_channel.set_permissions(v_role, read_messages=False, send_messages=False)
-                await v_channel.set_permissions(ctx.guild.default_role, read_messages=False, send_messages=False)
-                await v_channel.set_permissions(ctx.guild.me, read_messages=True, send_messages=True, embed_links=True)
-                await cur.execute("INSERT INTO captcha VALUES (?, ?, ?, ?)", (ctx.guild.id, v_channel.id, v_role.id, u_role.id))
+                
+                for channel in ctx.guild.text_channels:
+                    if channel.permissions_for(ctx.guild.default_role).view_channel:
+                        await channel.set_permissions(
+                            v_role, read_messages=True, send_messages=True, view_channel=True
+                        )
+                    else:
+                        await channel.set_permissions(
+                            v_role, read_messages=False, send_messages=False, view_channel=False
+                        )
+
+                for channel in ctx.guild.voice_channels:
+                    if channel.permissions_for(ctx.guild.default_role).view_channel:
+                        await channel.set_permissions(
+                            v_role, connect=True, speak=True, view_channel=True
+                        )
+                    else:
+                        await channel.set_permissions(
+                            v_role, connect=False, speak=False, view_channel=False
+                        )
+
+                    
+                await cur.execute("INSERT INTO captcha VALUES (?, ?)", (ctx.guild.id, v_role.id))
                 await self.bot.db.commit()
+
                 embed = discord.Embed(
                     title="Captcha Setup", 
                     description=(
                         f"**Verified Role:** {v_role.mention}\n"
-                        f"**Unverified Role:** {u_role.mention}\n"
-                        f"**Verification Channel:** {v_channel.mention}"
                     )
                     )
                 await ctx.send(embed=embed)
+
         except Exception as e:
             await ctx.send(f"Failed to setup captcha: {e}")
 
@@ -76,9 +91,7 @@ class Utility(commands.Cog):
             if data is None:
                 await ctx.send(f"This server does not have a captcha enabled, Please run `{ctx.prefix}captcha enable` to enable.")
                 return
-            channel: discord.TextChannel = ctx.guild.get_channel(data[1])
-            role1: discord.Role = ctx.guild.get_role(data[2])
-            role2: discord.Role = ctx.guild.get_role(data[3])
+            role1: discord.Role = ctx.guild.get_role(data[1])
 
             confirm = await ctx.confirm("Are you sure you want to disable captcha?")
             if not confirm:
@@ -86,9 +99,6 @@ class Utility(commands.Cog):
                 return
             
             await role1.delete()
-            await role2.delete()
-            await channel.delete()
             await cur.execute("DELETE FROM captcha WHERE guild_id = ?", (ctx.guild.id,))
             await self.bot.db.commit()
             await ctx.channel.send(embed=discord.Embed(title="Captcha Verification Disabled", color=self.bot.config.color), delete_after=10)
-
